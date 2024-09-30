@@ -12,7 +12,7 @@ class Clean {
     stdout.write('\r${zty()}$name - Iniciando... \n');
     stdout.write('\r${zty()}$name - Buscando Projetos Válidos   ');
     loader.start();
-    var paths = await getProjectsPaths();
+    var paths = await getProjectsPaths(ignoreZty: true);
     loader.stop();
 
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');

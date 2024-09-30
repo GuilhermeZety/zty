@@ -14,12 +14,17 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
-  if (arguments.contains('--clean') || arguments.contains('-c')) {
+  if (arguments.contains('clean')) {
     await Clean.run(arguments);
+    mostrarCursor();
+    return;
   }
-  if (arguments.contains('--git-status') || arguments.contains('-gs')) {
+  if (arguments.contains('status')) {
     await GitStatus.run(arguments);
+    mostrarCursor();
+    return;
   }
 
-  mostrarCursor();
+  //TODO: Criar um retorno para caso não houver opções
+  showHelp();
 }

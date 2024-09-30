@@ -1,6 +1,6 @@
 import 'dart:io';
 
-Future<List<(String path, String? type)>> getProjectsPaths({bool getType = false}) async {
+Future<List<(String path, String? type)>> getProjectsPaths({bool getType = true, bool ignoreZty = false}) async {
   List<(String, String?)> projects = [];
   List<Directory> childrens = [];
 
@@ -45,6 +45,8 @@ Future<List<(String path, String? type)>> getProjectsPaths({bool getType = false
       projects.add((folder.path, type));
     }
   }
-  projects.removeWhere((e) => e.$1.contains('my_cli_app') || e.$1.contains('zty'));
+  if (ignoreZty) {
+    projects.removeWhere((e) => e.$1.contains('my_cli_app') || e.$1.contains('zty'));
+  }
   return projects;
 }
