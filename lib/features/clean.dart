@@ -17,30 +17,39 @@ class Clean {
 
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
+    //TODO: Adicionar argumento --only para dar clean só em um ou multiplos projetos
     for (var path in paths) {
       if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
         // Não suportado
         stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.red('NÃO SUPORTADO')} \n');
         continue;
       }
-      await Task(
-        tag: '$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}',
-        description: 'Limpando',
-        task: () async {
-          if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
-            Directory.current = path.$1;
-            List<String> args = ['clean'];
-            Process process = await Process.start(path.$2 == 'Flutter' ? 'flutter' : 'dart', args);
 
-            // Aguarda o término do processo e obtém o código de saída
-            int exitCode = await process.exitCode;
+      if (arguments.contains('--apply')) {
+        await Task(
+          tag: '$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}',
+          description: 'Limpando',
+          task: () async {
+            if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
+              Directory.current = path.$1;
+              List<String> args = ['clean'];
+              Process process = await Process.start(path.$2 == 'Flutter' ? 'flutter' : 'dart', args);
 
-            if (exitCode != 0) {
-              throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              // Aguarda o término do processo e obtém o código de saída
+              int exitCode = await process.exitCode;
+
+              if (exitCode != 0) {
+                throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              }
             }
-          }
-        },
-      ).run();
+          },
+        ).run();
+      } else {
+        if (Directory('${path.$1}/build').existsSync()) {
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.red('PENDENTE')} \n');
+        }
+        // caso tenha pasta /build retornar como pendente
+      }
     }
   }
 }
