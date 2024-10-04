@@ -45,7 +45,7 @@ class Clean {
         ).run();
       } else {
         var splitted = path.$1.split('/');
-        if (!await Directory('${path.$1}/build/').exists()) {
+        if (await Directory('${path.$1}/build/').exists()) {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(splitted.last)} ${AnsiStyles.green('OK')} \n');
