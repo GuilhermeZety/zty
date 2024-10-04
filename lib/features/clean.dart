@@ -44,10 +44,11 @@ class Clean {
           },
         ).run();
       } else {
-        if (await Directory('${path.$1}/build/').exists()) {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.red('PENDENTE')} \n');
+        var splitted = path.$1.split('/');
+        if (!await Directory('${path.$1}/build/').exists()) {
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.green('OK')} \n');
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(splitted.last)} ${AnsiStyles.green('OK')} \n');
         }
         // caso tenha pasta /build retornar como pendente
       }

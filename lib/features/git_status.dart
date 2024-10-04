@@ -24,11 +24,12 @@ class GitStatus {
 
       // Retorna se tem algum projeto esperando dar commit
       process.stdout.transform(utf8.decoder).listen((data) {
+        var splitted = path.$1.split('/');
         if (data.contains('Changes not staged for commit') ||
             data.contains('Untracked files') ||
             data.contains('Changes to be committed') ||
             data.contains("Your branch is ahead of 'origin/main' by")) {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}  -  COM PENDENCIAS   \n');
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')}  -  COM PENDENCIAS   \n');
         }
       });
 
