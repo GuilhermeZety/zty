@@ -17,7 +17,6 @@ class Clean {
 
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
-    //TODO: Adicionar argumento --only para dar clean só em um ou multiplos projetos
     for (var path in paths) {
       if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
         // Não suportado
@@ -45,8 +44,10 @@ class Clean {
           },
         ).run();
       } else {
-        if (Directory('${path.$1}/build').existsSync()) {
+        if (await Directory('${path.$1}/build/').exists()) {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.red('PENDENTE')} \n');
+        } else {
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.green('OK')} \n');
         }
         // caso tenha pasta /build retornar como pendente
       }
