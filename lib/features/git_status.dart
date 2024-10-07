@@ -17,6 +17,18 @@ class GitStatus {
     loader.stop();
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
+    if (arguments.contains('--only')) {
+      var index = arguments.indexOf('--only');
+      if (arguments.length <= index + 1) {
+        throw Exception('--only precisa que você referencie um projeto');
+      }
+      List<String> only = arguments[index + 1].split(',');
+
+      paths = paths.where((element) {
+        return only.contains(element.$1.split('/').last);
+      }).toList();
+    }
+
     for (var path in paths) {
       Directory.current = path.$1;
       List<String> args = ['status'];
