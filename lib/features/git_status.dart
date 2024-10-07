@@ -27,6 +27,17 @@ class GitStatus {
         return only.contains(element.$1.split('/').last);
       }).toList();
     }
+    if (arguments.contains('--ignore')) {
+      var index = arguments.indexOf('--ignore');
+      if (arguments.length <= index + 1) {
+        throw Exception('--ignore precisa que você referencie um projeto');
+      }
+      List<String> ignore = arguments[index + 1].split(',');
+
+      paths.removeWhere((element) {
+        return ignore.contains(element.$1.split('/').last);
+      });
+    }
 
     stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n');
 
