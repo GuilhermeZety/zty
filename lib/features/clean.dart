@@ -15,6 +15,18 @@ class Clean {
     var paths = await getProjectsPaths(ignoreZty: true);
     loader.stop();
 
+    if (arguments.contains('--only')) {
+      var index = arguments.indexOf('--only');
+      if (arguments.length <= index + 1) {
+        throw Exception('--only precisa que você referencie um projeto');
+      }
+      List<String> only = arguments[index + 1].split(',');
+
+      paths = paths.where((element) {
+        return only.contains(element.$1.split('/').last);
+      }).toList();
+    }
+
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
     for (var path in paths) {
@@ -62,7 +74,7 @@ class Clean {
         if (has) {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(splitted.last)} ${AnsiStyles.green('OK')} \n');
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.green('OK')} \n');
         }
 
         // caso tenha pasta /build retornar como pendente
