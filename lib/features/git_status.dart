@@ -15,7 +15,6 @@ class GitStatus {
     loader.start();
     var paths = await getProjectsPaths();
     loader.stop();
-    stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
     if (arguments.contains('--only')) {
       var index = arguments.indexOf('--only');
@@ -28,6 +27,8 @@ class GitStatus {
         return only.contains(element.$1.split('/').last);
       }).toList();
     }
+
+    stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n');
 
     for (var path in paths) {
       Directory.current = path.$1;
@@ -42,6 +43,8 @@ class GitStatus {
             data.contains('Changes to be committed') ||
             data.contains("Your branch is ahead of 'origin/main' by")) {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')}  -  COM PENDENCIAS   \n');
+        } else {
+          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')}  -  ${AnsiStyles.green('OK')}   \n');
         }
       });
 
