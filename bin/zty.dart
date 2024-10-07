@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:zty/features/clean.dart';
 import 'package:zty/features/git_status.dart';
+import 'package:zty/features/update.dart';
 import 'package:zty/help.dart';
 import 'package:zty/utils.dart';
 
@@ -21,6 +22,11 @@ Future<void> main(List<String> arguments) async {
   }
   if (arguments.contains('status')) {
     await GitStatus.run(arguments);
+    mostrarCursor();
+    return;
+  }
+  if (arguments.contains('update')) {
+    await Update.run(arguments);
     mostrarCursor();
     return;
   }
