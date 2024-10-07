@@ -18,12 +18,6 @@ class Clean {
     stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
 
     for (var path in paths) {
-      if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
-        // Não suportado
-        stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} ${AnsiStyles.red('NÃO SUPORTADO')} \n');
-        continue;
-      }
-
       if (arguments.contains('--apply')) {
         await Task(
           tag: '$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}',
@@ -41,15 +35,36 @@ class Clean {
                 throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
               }
             }
+            if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
+              Directory.current = path.$1;
+              List<String> args = ['-rf', 'node_modules'];
+              Process process = await Process.start('rm', args);
+
+              // Aguarda o término do processo e obtém o código de saída
+              int exitCode = await process.exitCode;
+
+              if (exitCode != 0) {
+                throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              }
+            }
           },
         ).run();
       } else {
         var splitted = path.$1.split('/');
-        if (await Directory('${path.$1}/build/').exists()) {
+        bool has = false;
+
+        if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
+          has = await Directory('${path.$1}/node_modules/').exists();
+        } else if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
+          has = await Directory('${path.$1}/build/').exists();
+        }
+
+        if (has) {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
           stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(splitted.last)} ${AnsiStyles.green('OK')} \n');
         }
+
         // caso tenha pasta /build retornar como pendente
       }
     }

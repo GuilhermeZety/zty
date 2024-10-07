@@ -13,3 +13,5 @@ void showHelp() {
   stdout.write('\r${AnsiStyles.green('--help,-h')}  Exibe esta mensagem de ajuda\n');
   stdout.write('\r\n');
 }
+
+//TODO: criar função "update" para ir para pasta principal, verificar se ha alterações, caso tiver ja rodar um git pull
