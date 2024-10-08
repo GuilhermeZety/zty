@@ -74,18 +74,21 @@ class Clean {
         ).run();
       } else {
         var splitted = path.$1.split('/');
-        bool has = false;
+        Directory? directory;
 
         if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
-          has = await Directory('${path.$1}/node_modules/').exists();
+          directory = Directory('${path.$1}/node_modules');
         } else if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
-          has = await Directory('${path.$1}/build/').exists();
+          directory = Directory('${path.$1}/build');
         }
+        if (directory == null) return;
 
-        if (has) {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
+        if (await directory.exists()) {
+          stdout.write(
+              '\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.green('OK')} \n');
+          stdout
+              .write('\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.green('OK')} \n');
         }
 
         // caso tenha pasta /build retornar como pendente
@@ -113,3 +116,17 @@ String typeNamed(String? type) {
 }
 
 String get name => AnsiStyles.cyan('[CLEAN]');
+
+Future<String> getDirectorySize(String directory) async {
+  int totalSize = 0;
+
+  // Lista todos os arquivos e diretórios dentro do diretório
+  await for (FileSystemEntity entity in (Directory(directory)).list(recursive: true, followLinks: false)) {
+    if (entity is File) {
+      // Somar o tamanho dos arquivos
+      totalSize += await entity.length();
+    }
+  }
+
+  return '[${(totalSize / 1024 / 1024).toStringAsFixed(2)} MB]';
+}
