@@ -6,6 +6,7 @@ void showHelp() {
   stdout.write('\r\n');
   stdout.write('\r${AnsiStyles.yellow('Opções')}:\n');
   stdout.write('\r\n');
+  stdout.write('\r${AnsiStyles.green('verify')}  Verifica se há atualizações pendentes no seu projeto\n');
   stdout.write('\r${AnsiStyles.green('status')}  Verifica se possui algum projeto com pendências para subir ao git\n');
   stdout.write('\r${AnsiStyles.green('clean')}  Verifica se há algum projeto que precisa de limpeza\n');
   stdout.write('\r${AnsiStyles.green('clean --apply')} Verifica e limpa todos os projetos\n');
