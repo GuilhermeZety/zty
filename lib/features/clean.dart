@@ -73,13 +73,13 @@ class Clean {
             if (path.$2 == "PHP") {
               Directory.current = path.$1;
               // Remover pasta node_modules// Para PHP, limpar o cache do Composer e arquivos temporários
-              List<String> args = ['clear-cache'];
-              Process process = await Process.start('composer', args);
+              // List<String> args = ['clear-cache'];
+              // Process process = await Process.start('composer', args);
 
-              int exitCode = await process.exitCode;
-              if (exitCode != 0) {
-                throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
-              }
+              // int exitCode = await process.exitCode;
+              // if (exitCode != 0) {
+              //   throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              // }
               if (await Directory('${path.$1}/node_modules').exists()) {
                 List<String> nodeArgs = ['-rf', 'node_modules'];
                 Process nodeProcess = await Process.start('rm', nodeArgs);
