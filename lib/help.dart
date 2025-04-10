@@ -18,6 +18,8 @@ void showHelp() {
   stdout.write('\r\n');
   stdout.write('\r${AnsiStyles.green('--help,-h')}  Exibe esta mensagem de ajuda\n');
   stdout.write('\r\n');
+  stdout.write('\r${AnsiStyles.green('update')}  Atualiza a CLI ZTY para a versão mais recente\n');
+  stdout.write('\r\n');
 }
 
 //TODO: criar função "update" para ir para pasta principal, verificar se ha alterações, caso tiver ja rodar um git pull

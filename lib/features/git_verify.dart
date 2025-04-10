@@ -35,16 +35,18 @@ class GitVerify {
         continue;
       }
 
-      final statusResult = await Process.run('git', ['status']);
-      if (statusResult.exitCode != 0) {
-        print(AnsiStyles.red('Erro ao executar git status na branch $branch'));
+      // Verifica se há commits para puxar do remoto
+      final revListResult = await Process.run('git', ['rev-list', 'HEAD..origin/$branch', '--count']);
+      if (revListResult.exitCode != 0) {
+        print(AnsiStyles.red('Erro ao verificar commits pendentes na branch $branch'));
         continue;
       }
 
-      if (statusResult.stdout.contains('Your branch is up to date')) {
+      final commitCount = int.parse(revListResult.stdout.toString().trim());
+      if (commitCount == 0) {
         stdout.write('\r${zty()}$name-${AnsiStyles.cyanBright('{$branch}')} - ${AnsiStyles.green('TUDO OK')} \n');
       } else {
-        stdout.write('\r${zty()}$name-${AnsiStyles.cyanBright('{$branch}')} - ${AnsiStyles.red('ATUALIZAÇÕES PENDENTES')} \n');
+        stdout.write('\r${zty()}$name-${AnsiStyles.cyanBright('{$branch}')} - ${AnsiStyles.red('$commitCount ATUALIZAÇÕES PENDENTES')} \n');
       }
     }
 
