@@ -70,6 +70,17 @@ class Clean {
                 throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
               }
             }
+            if (path.$2 == "PHP") {
+              Directory.current = path.$1;
+              // Para PHP, limpar o cache do Composer e arquivos temporários
+              List<String> args = ['clear-cache'];
+              Process process = await Process.start('composer', args);
+
+              int exitCode = await process.exitCode;
+              if (exitCode != 0) {
+                throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              }
+            }
           },
         ).run();
       } else {
@@ -80,6 +91,8 @@ class Clean {
           directory = Directory('${path.$1}/node_modules');
         } else if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
           directory = Directory('${path.$1}/build');
+        } else if (path.$2 == 'PHP') {
+          directory = Directory('${path.$1}/vendor');
         }
         if (directory == null) return;
 
@@ -110,6 +123,8 @@ String typeNamed(String? type) {
       return AnsiStyles.cyan('[Typescript]');
     case 'JavaScript':
       return AnsiStyles.yellow('[JavaScript]');
+    case 'PHP':
+      return AnsiStyles.magenta('[PHP]');
     default:
       return 'Nenhum';
   }

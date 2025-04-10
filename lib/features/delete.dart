@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:ansi_styles/ansi_styles.dart';
+import 'package:zty/features/clean.dart';
 import 'package:zty/paths.dart';
 import 'package:zty/rotating_loader.dart';
 import 'package:zty/task.dart';
@@ -76,24 +77,6 @@ class Delete {
             '\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
       }
     }
-  }
-}
-
-String typeNamed(String? type) {
-  if (type == null) {
-    return '';
-  }
-  switch (type) {
-    case 'Flutter':
-      return AnsiStyles.blue('[Flutter]');
-    case 'Dart':
-      return AnsiStyles.blue('[Dart]');
-    case 'Typescript':
-      return AnsiStyles.cyan('[Typescript]');
-    case 'JavaScript':
-      return AnsiStyles.yellow('[JavaScript]');
-    default:
-      return 'Nenhum';
   }
 }
 
