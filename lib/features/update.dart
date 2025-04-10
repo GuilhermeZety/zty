@@ -38,9 +38,9 @@ class Update {
     var pullProcess = await Process.start('git', ['pull']);
     await pullProcess.exitCode;
 
-    // Ativa o pacote localmente
-    var activateProcess = await Process.start('dart', ['pub', 'global', 'activate', '--source', 'path', '.']);
-    await activateProcess.exitCode;
+    // Executa dart run para atualizar
+    var runProcess = await Process.start('dart', ['run']);
+    await runProcess.exitCode;
 
     loader.stop();
     stdout.write('\r${zty()}$name - ${AnsiStyles.green('Pacote atualizado com sucesso')} \n');

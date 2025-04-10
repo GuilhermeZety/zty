@@ -14,12 +14,12 @@ Future<List<(String path, String? type)>> getProjectsPaths({bool getType = true,
       type = 'Flutter';
     } else if (File('${folder.path}/pubspec.yaml').existsSync()) {
       type = 'Dart';
+    } else if (File('${folder.path}/composer.json').existsSync()) {
+      type = 'PHP';
     } else if (File('${folder.path}/tsconfig.json').existsSync()) {
       type = 'Typescript';
     } else if (File('${folder.path}/package.json').existsSync()) {
       type = 'JavaScript';
-    } else if (File('${folder.path}/composer.json').existsSync()) {
-      type = 'PHP';
     }
 
     if (type != null) {
@@ -37,12 +37,12 @@ Future<List<(String path, String? type)>> getProjectsPaths({bool getType = true,
       type = 'Flutter';
     } else if (File('${folder.path}/pubspec.yaml').existsSync()) {
       type = 'Dart';
+    } else if (File('${folder.path}/composer.json').existsSync()) {
+      type = 'PHP';
     } else if (File('${folder.path}/tsconfig.json').existsSync()) {
       type = 'Typescript';
     } else if (File('${folder.path}/package.json').existsSync()) {
       type = 'JavaScript';
-    } else if (File('${folder.path}/composer.json').existsSync()) {
-      type = 'PHP';
     }
 
     if (type != null) {
