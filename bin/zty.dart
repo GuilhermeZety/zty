@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:zty/features/clean.dart';
+import 'package:zty/features/delete.dart';
 import 'package:zty/features/git_status.dart';
 import 'package:zty/features/git_verify.dart';
 import 'package:zty/features/update.dart';
@@ -28,6 +29,11 @@ Future<void> main(List<String> arguments) async {
   }
   if (arguments.contains('update')) {
     await Update.run(arguments);
+    mostrarCursor();
+    return;
+  }
+  if (arguments.contains('delete')) {
+    await Delete.run(arguments);
     mostrarCursor();
     return;
   }

@@ -10,6 +10,8 @@ void showHelp() {
   stdout.write('\r${AnsiStyles.green('status')}  Verifica se possui algum projeto com pendências para subir ao git\n');
   stdout.write('\r${AnsiStyles.green('clean')}  Verifica se há algum projeto que precisa de limpeza\n');
   stdout.write('\r${AnsiStyles.green('clean --apply')} Verifica e limpa todos os projetos\n');
+  stdout.write('\r${AnsiStyles.green('delete')}  Lista os projetos que podem ser movidos para lixeira\n');
+  stdout.write('\r${AnsiStyles.green('delete --apply')} Move os projetos selecionados para a lixeira\n');
   stdout.write('\r\n');
   stdout.write('\r${AnsiStyles.green('--only projeto1')}  Usa a função em N projetos especificos, EX: "zty clean --only projeto1,projeto2"\n');
   stdout.write('\r${AnsiStyles.green('--ignore projeto1')}  Usa a função em todos IGNORANDO o projeto especificado, EX: "zty clean --only projeto1,projeto2"\n');
