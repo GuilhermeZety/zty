@@ -18,6 +18,8 @@ Future<List<(String path, String? type)>> getProjectsPaths({bool getType = true,
       type = 'Typescript';
     } else if (File('${folder.path}/package.json').existsSync()) {
       type = 'JavaScript';
+    } else if (File('${folder.path}/composer.json').existsSync()) {
+      type = 'PHP';
     }
 
     if (type != null) {
@@ -39,6 +41,8 @@ Future<List<(String path, String? type)>> getProjectsPaths({bool getType = true,
       type = 'Typescript';
     } else if (File('${folder.path}/package.json').existsSync()) {
       type = 'JavaScript';
+    } else if (File('${folder.path}/composer.json').existsSync()) {
+      type = 'PHP';
     }
 
     if (type != null) {

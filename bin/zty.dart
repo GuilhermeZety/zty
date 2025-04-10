@@ -5,6 +5,7 @@ import 'package:zty/features/delete.dart';
 import 'package:zty/features/git_status.dart';
 import 'package:zty/features/git_verify.dart';
 import 'package:zty/features/update.dart';
+import 'package:zty/features/version.dart';
 import 'package:zty/help.dart';
 import 'package:zty/utils.dart';
 
@@ -14,6 +15,12 @@ Future<void> main(List<String> arguments) async {
   ocultarCursor();
   if (arguments.contains('--help') || arguments.contains('-h') || arguments.isEmpty) {
     showHelp();
+    return;
+  }
+
+  if (arguments.contains('--version') || arguments.contains('-v')) {
+    await Version.run();
+    mostrarCursor();
     return;
   }
 

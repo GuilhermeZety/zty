@@ -17,6 +17,7 @@ void showHelp() {
   stdout.write('\r${AnsiStyles.green('--ignore projeto1')}  Usa a função em todos IGNORANDO o projeto especificado, EX: "zty clean --only projeto1,projeto2"\n');
   stdout.write('\r\n');
   stdout.write('\r${AnsiStyles.green('--help,-h')}  Exibe esta mensagem de ajuda\n');
+  stdout.write('\r${AnsiStyles.green('--version,-v')}  Exibe a versão atual da CLI\n');
   stdout.write('\r\n');
   stdout.write('\r${AnsiStyles.green('update')}  Atualiza a CLI ZTY para a versão mais recente\n');
   stdout.write('\r\n');
