@@ -29,9 +29,19 @@ CLI opensource para utilitários do seu setup Flutter e outros frameworks. Uma f
 
 ## Instalação
 
+### Linux
 1. Instale o Dart SDK:
    ```bash
-   brew install dart-sdk
+   # Usando apt (Debian/Ubuntu)
+   sudo apt-get update
+   sudo apt-get install apt-transport-https
+   wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
+   echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list
+   sudo apt-get update
+   sudo apt-get install dart
+
+   # Usando snap (Ubuntu e outras distribuições compatíveis)
+   sudo snap install dart --classic
    ```
 
 2. Clone o repositório:
@@ -56,9 +66,12 @@ CLI opensource para utilitários do seu setup Flutter e outros frameworks. Uma f
 
    **Nota**: Se necessário, adicione o path do Dart ao seu PATH:
    ```bash
-   export PATH="$PATH":"$HOME/.pub-cache/bin"
+   echo 'export PATH="$PATH":"$HOME/.pub-cache/bin"' >> ~/.bashrc
+   source ~/.bashrc
    ```
-   Para uso permanente, adicione esta linha ao seu arquivo de configuração do shell (.bashrc, .zshrc, etc).
+   Para outros shells como zsh, adicione a linha ao arquivo ~/.zshrc correspondente.
+
+### macOS
 
 ## Comandos
 
