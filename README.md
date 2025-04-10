@@ -26,6 +26,7 @@ CLI opensource para utilitários do seu setup Flutter e outros frameworks. Uma f
 - Flutter
 - Dart
 - Node
+- PHP
 
 ## Instalação
 
