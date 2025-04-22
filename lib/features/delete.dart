@@ -73,8 +73,7 @@ class Delete {
         ).run();
       } else {
         var splitted = path.$1.split('/');
-        stdout.write(
-            '\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
+        stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} \n');
       }
     }
   }
