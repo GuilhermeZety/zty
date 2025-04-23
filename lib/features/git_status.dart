@@ -10,8 +10,8 @@ import 'package:zty/zty.dart';
 class GitStatus {
   static Future run(List<String> arguments) async {
     var loader = Loader();
-    stdout.write('\r${zty()}$name - Iniciando... \n');
-    stdout.write('\r${zty()}$name - Buscando Projetos Válidos   ');
+    stdout.write('${zty()}$name - Iniciando...\r');
+    stdout.write('${zty()}$name - Buscando Projetos Válidos... ');
     loader.start();
     var paths = await getProjectsPaths();
     loader.stop();
@@ -39,29 +39,60 @@ class GitStatus {
       });
     }
 
-    stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n');
-
+    stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n\n');
+    int processed = 0;
+    int total = paths.length;
     for (var path in paths) {
+      processed++;
+      var splitted = path.$1.split('/');
+      String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
+      String progress = AnsiStyles.cyan('[$processed/$total]');
+
       Directory.current = path.$1;
-      List<String> args = ['status'];
+      List<String> args = ['status', '--porcelain']; // Use --porcelain for easier parsing
       Process process = await Process.start('git', args);
 
-      // Retorna se tem algum projeto esperando dar commit
+      String output = '';
       process.stdout.transform(utf8.decoder).listen((data) {
-        var splitted = path.$1.split('/');
-        if (data.contains('Changes not staged for commit') ||
-            data.contains('Untracked files') ||
-            data.contains('Changes to be committed') ||
-            data.contains("Your branch is ahead of 'origin/main' by")) {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')}  -  COM PENDENCIAS   \n');
-        } else {
-          stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')}  -  ${AnsiStyles.green('OK')}   \n');
-        }
+        output += data;
       });
 
       // Aguarda o término do processo e obtém o código de saída
-      await process.exitCode;
+      int exitCode = await process.exitCode;
+
+      if (exitCode == 0) {
+        if (output.trim().isEmpty) {
+          // Check remote status
+          Process aheadProcess = await Process.start('git', ['rev-list', '--count', 'HEAD@{u}..HEAD']);
+          String aheadCount = '';
+          aheadProcess.stdout.transform(utf8.decoder).listen((data) => aheadCount += data);
+          await aheadProcess.exitCode;
+
+          Process behindProcess = await Process.start('git', ['rev-list', '--count', 'HEAD..HEAD@{u}']);
+          String behindCount = '';
+          behindProcess.stdout.transform(utf8.decoder).listen((data) => behindCount += data);
+          await behindProcess.exitCode;
+
+          int ahead = int.tryParse(aheadCount.trim()) ?? 0;
+          int behind = int.tryParse(behindCount.trim()) ?? 0;
+
+          if (ahead > 0 && behind > 0) {
+            stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.yellow('DIVERGED')} (Ahead: $ahead, Behind: $behind)\n');
+          } else if (ahead > 0) {
+            stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.cyan('AHEAD')} ($ahead commits)\n');
+          } else if (behind > 0) {
+            stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.magenta('BEHIND')} ($behind commits)\n');
+          } else {
+            stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.green('OK')}\n');
+          }
+        } else {
+          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.red('COM PENDÊNCIAS')}\n');
+        }
+      } else {
+        stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} - ${AnsiStyles.red('ERRO AO VERIFICAR STATUS')}\n');
+      }
     }
+    stdout.write('\n${zty()}$name - Finalizado.\n');
   }
 }
 

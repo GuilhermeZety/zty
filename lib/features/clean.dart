@@ -9,8 +9,8 @@ import 'package:zty/zty.dart';
 class Clean {
   static Future run(List<String> arguments) async {
     var loader = Loader();
-    stdout.write('\r${zty()}$name - Iniciando... \n');
-    stdout.write('\r${zty()}$name - Buscando Projetos Válidos   ');
+    stdout.write('${zty()}$name - Iniciando...');
+    stdout.write('\n\n${zty()}$name - Buscando Projetos Válidos... ');
     loader.start();
     var paths = await getProjectsPaths(ignoreZty: true);
     loader.stop();
@@ -38,12 +38,25 @@ class Clean {
       });
     }
 
-    stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
-
+    stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n\n');
+    int processed = 0;
+    int total = paths.length;
     for (var path in paths) {
+      processed++;
+      var splitted = path.$1.split('/');
+      String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
+      String progress = AnsiStyles.cyan('[$processed/$total]');
+
       if (arguments.contains('--apply')) {
+        stdout.write('${AnsiStyles.bgYellow.black.bold(' Atenção! ')} Você tem certeza que deseja limpar o projeto ${AnsiStyles.yellow(projeto)}? [s/N]: ');
+        String? confirm = stdin.readLineSync();
+        if (confirm == null || confirm.toLowerCase() != 's') {
+          stdout.write('$progress ${AnsiStyles.yellow('Ação cancelada para')} $projeto.\n');
+
+          continue;
+        }
         await Task(
-          tag: '$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}',
+          tag: '$progress $name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)}',
           description: 'Limpando',
           task: () async {
             if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
@@ -100,6 +113,7 @@ class Clean {
             }
           },
         ).run();
+        stdout.write('${AnsiStyles.red('[ZTY]')}$name  ${AnsiStyles.green('✔ Limpeza concluída para:')} ${AnsiStyles.yellow(projeto)}\n');
       } else {
         var splitted = path.$1.split('/');
         Directory? directory;
@@ -118,16 +132,15 @@ class Clean {
         if (directory == null) return;
 
         if (await directory.exists()) {
-          stdout.write(
-              '\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.red('PENDENTE')} \n');
+          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
-          stdout
-              .write('\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} ${AnsiStyles.green('OK')} \n');
+          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.green('OK')} \n');
         }
 
         // caso tenha pasta /build retornar como pendente
       }
     }
+    stdout.write('\n${zty()}$name - Finalizado.\n');
   }
 }
 

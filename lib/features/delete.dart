@@ -10,8 +10,8 @@ import 'package:zty/zty.dart';
 class Delete {
   static Future run(List<String> arguments) async {
     var loader = Loader();
-    stdout.write('\r${zty()}$name - Iniciando... \n');
-    stdout.write('\r${zty()}$name - Buscando Projetos Válidos   ');
+    stdout.write('${zty()}$name - Iniciando...\r');
+    stdout.write('${zty()}$name - Buscando Projetos Válidos... ');
     loader.start();
     var paths = await getProjectsPaths(ignoreZty: true);
     loader.stop();
@@ -39,43 +39,61 @@ class Delete {
       });
     }
 
-    stdout.write('\r${zty()}$name - ${paths.length} Projetos Encontrados      \n');
-
+    stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n\n');
+    int processed = 0;
+    int total = paths.length;
     for (var path in paths) {
+      processed++;
+      var splitted = path.$1.split('/');
+      String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
+      String progress = AnsiStyles.cyan('[$processed/$total]');
+
       if (arguments.contains('--apply')) {
-        await Task(
-          tag: '$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)}',
-          description: 'Movendo para lixeira',
-          task: () async {
-            Directory directory = Directory(path.$1);
-            if (await directory.exists()) {
-              // No macOS, usar o comando 'mv' com a pasta .Trash
-              String trashPath = '${Platform.environment['HOME']}/.Trash';
-              String projectName = path.$1.split('/').last;
-              String destinationPath = '$trashPath/$projectName';
+        stdout.write('${AnsiStyles.bgRed.white.bold(' Atenção! ')} Você tem certeza que deseja mover o projeto ${AnsiStyles.yellow(projeto)} para a lixeira? [s/N]: ');
+        String? confirm = stdin.readLineSync();
+        if (confirm == null || confirm.toLowerCase() != 's') {
+          stdout.write('$progress ${AnsiStyles.yellow('Ação cancelada para')} $projeto.\n');
 
-              // Verifica se já existe um arquivo com o mesmo nome na lixeira
-              int counter = 1;
-              while (await Directory(destinationPath).exists()) {
-                destinationPath = '$trashPath/${projectName}_$counter';
-                counter++;
+          continue;
+        }
+        try {
+          await Task(
+            tag: '$progress $name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)}',
+            description: 'Movendo para lixeira',
+            task: () async {
+              Directory directory = Directory(path.$1);
+              if (await directory.exists()) {
+                String trashPath = '${Platform.environment['HOME']}/.Trash';
+                String projectName = path.$1.split('/').last;
+                String destinationPath = '$trashPath/$projectName';
+                int counter = 1;
+                while (await Directory(destinationPath).exists()) {
+                  destinationPath = '$trashPath/${projectName}_$counter';
+                  counter++;
+                }
+                List<String> args = [path.$1, destinationPath];
+                Process process = await Process.start('mv', args);
+                int exitCode = await process.exitCode;
+                if (exitCode != 0) {
+                  throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projectName)} EXITCODE != 0');
+                }
               }
-
-              List<String> args = [path.$1, destinationPath];
-              Process process = await Process.start('mv', args);
-
-              int exitCode = await process.exitCode;
-              if (exitCode != 0) {
-                throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projectName)} EXITCODE != 0');
-              }
-            }
-          },
-        ).run();
+            },
+          ).run();
+          stdout.write('$progress ${AnsiStyles.green('✔ Projeto movido para a lixeira:')} ${AnsiStyles.yellow(projeto)}\n');
+        } catch (e) {
+          stdout.write('$progress ${AnsiStyles.red('Erro ao mover')} $projeto: ${e.toString()}\n');
+        }
       } else {
-        var splitted = path.$1.split('/');
-        stdout.write('\r${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow('${splitted[splitted.length - 2]}/${splitted.last}')} \n');
+        try {
+          String size = await getDirectorySize(path.$1);
+          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} $size ${AnsiStyles.yellow(projeto)}\n');
+        } catch (e) {
+          stdout.write('$progress ${AnsiStyles.red('Erro ao calcular tamanho de')} $projeto: ${e.toString()}\n');
+        }
       }
     }
+    stdout.write('\n${zty()}$name - Finalizado.\n');
   }
 }
 

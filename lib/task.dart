@@ -16,8 +16,15 @@ class Task {
     final message = '${AnsiStyles.red('[ZTY]')}${tag != null ? '$tag' : ''} - $description';
     stdout.write('$message  ');
     loader.start();
-    await task();
-    loader.stop();
-    stdout.write('\r$message  ${AnsiStyles.green('OK')} \n');
+    try {
+      await task();
+      loader.stop();
+      stdout.write('\r$message  ${AnsiStyles.green('✔ OK')} \n');
+    } catch (e) {
+      loader.stop();
+      stdout.write('\r$message  ${AnsiStyles.red('Erro:')} ${e.toString().replaceAll('Exception: ', '')} \n');
+      // Re-throw the exception if needed, or handle it further.
+      // For now, just printing the error.
+    }
   }
 }

@@ -9,18 +9,25 @@ import 'package:zty/zty.dart';
 class Update {
   static Future run(List<String> arguments) async {
     var loader = Loader();
-    stdout.write('\r${zty()}$name - Iniciando... \n');
-    stdout.write('\r${zty()}$name - Buscando Atualizações   ');
+    stdout.write('${zty()}$name - Iniciando...');
+    stdout.write('${zty()}$name - Buscando Atualizações... ');
     loader.start();
-    var has = await hasUpdates();
+    bool hasUpdatesResult = false;
+    try {
+      hasUpdatesResult = await hasUpdates();
+    } catch (e) {
+      loader.stop();
+      stdout.write('\r${zty()}$name - ${AnsiStyles.red('Erro ao verificar atualizações:')} ${e.toString().replaceAll('Exception: ', '')} \n');
+      return;
+    }
     loader.stop();
 
-    if (!has) {
-      stdout.write('\r${zty()}$name - ${AnsiStyles.green('[ZTY está na ultima versão]')} \n');
+    if (!hasUpdatesResult) {
+      stdout.write('\r${zty()}$name - ${AnsiStyles.green('✔ ZTY já está na última versão!')} \n');
       return;
     }
 
-    stdout.write('\r${zty()}$name - Atualizando pacote   ');
+    stdout.write('\r${zty()}$name - ${AnsiStyles.yellow('Atualização encontrada!')} Iniciando atualização... ');
     loader.start();
 
     var paths = await getProjectsPaths();
@@ -40,10 +47,15 @@ class Update {
 
     // Executa dart run para atualizar
     var runProcess = await Process.start('dart', ['run']);
-    await runProcess.exitCode;
+    int runExitCode = await runProcess.exitCode;
 
     loader.stop();
-    stdout.write('\r${zty()}$name - ${AnsiStyles.green('Pacote atualizado com sucesso')} \n');
+    if (runExitCode == 0) {
+      stdout.write('\r${zty()}$name - ${AnsiStyles.green('✔ Pacote atualizado com sucesso!')} \n');
+    } else {
+      stdout.write('\r${zty()}$name - ${AnsiStyles.red('Erro ao atualizar o pacote (dart run).')} \n');
+    }
+    stdout.write('\n${zty()}$name - Finalizado.\n');
   }
 }
 
@@ -51,29 +63,37 @@ Future<bool> hasUpdates() async {
   var paths = await getProjectsPaths();
   bool has = false;
 
-  paths = paths.where((element) {
+  var ztyPath = paths.where((element) {
     return ['zty'].contains(element.$1.split('/').last);
   }).toList();
 
-  if (paths.isEmpty) {
-    throw Exception('Suporte a atualização não disponível!');
+  if (ztyPath.isEmpty) {
+    throw Exception('Diretório do ZTY não encontrado para verificação de atualizações.');
   }
-  Directory.current = paths.first.$1;
+  Directory.current = ztyPath.first.$1;
 
   // Atualiza referências remotas
   var fetchProcess = await Process.start('git', ['fetch']);
   await fetchProcess.exitCode;
 
   // Verifica se há commits para puxar do remoto
-  var revListProcess = await Process.start('git', ['rev-list', 'HEAD..origin/main', '--count']);
-  var commitCount = '';
+  var revListProcess = await Process.start('git', ['rev-list', '--count', 'HEAD..origin/main']);
+  var commitCountOutput = '';
+  var errorOutput = '';
   revListProcess.stdout.transform(utf8.decoder).listen((data) {
-    commitCount += data;
+    commitCountOutput += data;
   });
-  await revListProcess.exitCode;
+  revListProcess.stderr.transform(utf8.decoder).listen((data) {
+    errorOutput += data;
+  });
+  int exitCode = await revListProcess.exitCode;
+
+  if (exitCode != 0) {
+    throw Exception('Erro ao verificar commits remotos: ${errorOutput.trim()}');
+  }
 
   // Se houver commits pendentes para puxar, retorna true
-  if (int.parse(commitCount.trim()) > 0) {
+  if (int.tryParse(commitCountOutput.trim()) != null && int.parse(commitCountOutput.trim()) > 0) {
     has = true;
   }
 
