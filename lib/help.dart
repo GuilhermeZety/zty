@@ -12,7 +12,7 @@ void showHelp() {
   stdout.write('\r  ${AnsiStyles.green('verify')}        Verifica se há atualizações pendentes nos repositórios Git.\n');
   stdout.write('\r  ${AnsiStyles.green('status')}        Verifica o status Git dos projetos (pendências para commit/push).\n');
   stdout.write('\r  ${AnsiStyles.green('clean')}         Verifica quais projetos podem precisar de limpeza (ex: Flutter/Dart clean).\n');
-  stdout.write('\r  ${AnsiStyles.green('build')}         Gera bundles do app para Android e IOS\n');
+  stdout.write('\r  ${AnsiStyles.green('build')}         Gera bundles do aplicativo para Android e iOS em projetos Flutter.\n');
   stdout.write('\r  ${AnsiStyles.green('clean --apply')} Executa a limpeza nos projetos identificados.\n');
   stdout.write('\r  ${AnsiStyles.green('delete')}        Lista projetos que podem ser movidos para a lixeira (sem atividade Git recente).\n');
   stdout.write('\r  ${AnsiStyles.green('delete --apply')} Move os projetos selecionados para a lixeira.\n');
