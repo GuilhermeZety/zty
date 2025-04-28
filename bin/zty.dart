@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:zty/features/build.dart';
 import 'package:zty/features/clean.dart';
 import 'package:zty/features/delete.dart';
 import 'package:zty/features/git_status.dart';
@@ -46,6 +47,11 @@ Future<void> main(List<String> arguments) async {
   }
   if (arguments.contains('verify')) {
     await GitVerify.run(arguments);
+    mostrarCursor();
+    return;
+  }
+  if (arguments.contains('build')) {
+    await Build.run(arguments);
     mostrarCursor();
     return;
   }

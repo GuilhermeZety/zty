@@ -117,6 +117,17 @@ zty update
 ```
 Verifica, baixa e instala automaticamente a última versão disponível da CLI.
 
+### build
+Gera bundles do aplicativo para Android e iOS em projetos Flutter.
+```bash
+zty build            # Inicia o processo de build interativo
+```
+<!-- Opções específicas:
+- `--release`: Compila em modo release (padrão)
+- `--debug`: Compila em modo debug
+- `--only projeto1,projeto2`: Executa build apenas nos projetos especificados
+- `--ignore projeto1,projeto2`: Ignora os projetos especificados durante o build -->
+
 ## Opções Globais
 
 ### --only

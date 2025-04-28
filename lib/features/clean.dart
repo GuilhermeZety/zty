@@ -115,7 +115,6 @@ class Clean {
         ).run();
         stdout.write('${AnsiStyles.red('[ZTY]')}$name  ${AnsiStyles.green('✔ Limpeza concluída para:')} ${AnsiStyles.yellow(projeto)}\n');
       } else {
-        var splitted = path.$1.split('/');
         Directory? directory;
 
         if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
