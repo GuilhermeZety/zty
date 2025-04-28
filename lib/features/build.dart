@@ -68,9 +68,6 @@ class Build {
           description: 'Gerando App Bundle',
           task: () async {
             var process = await Process.start('flutter', ['build', 'appbundle', '--release']);
-            process.stdout.transform(utf8.decoder).listen((data) {
-              stdout.write(data);
-            });
             process.stderr.transform(utf8.decoder).listen((data) {
               stderr.write(data);
             });
@@ -96,9 +93,6 @@ class Build {
           description: 'Gerando IPA',
           task: () async {
             var process = await Process.start('flutter', ['build', 'ipa', '--release']);
-            process.stdout.transform(utf8.decoder).listen((data) {
-              stdout.write(data);
-            });
             process.stderr.transform(utf8.decoder).listen((data) {
               stderr.write(data);
             });
