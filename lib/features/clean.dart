@@ -41,22 +41,32 @@ class Clean {
     stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n\n');
     int processed = 0;
     int total = paths.length;
+
+    if (arguments.contains('--apply')) {
+      stdout.write('${AnsiStyles.bgYellow.black.bold(' Atenção! ')} Os seguintes projetos serão limpos:\n\n');
+      for (var path in paths) {
+        var splitted = path.$1.split('/');
+        String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
+        stdout.write('  - ${AnsiStyles.yellow(projeto)}\n');
+      }
+      stdout.write('\nVocê tem certeza que deseja limpar $total projeto${total > 1 ? 's' : ''}? [s/N]: ');
+      String? confirm = stdin.readLineSync();
+      if (confirm == null || confirm.toLowerCase() != 's') {
+        stdout.write('\n${zty()}$name - ${AnsiStyles.yellow('Operação cancelada.')}\n');
+        return;
+      }
+      stdout.write('\n');
+    }
+
     for (var path in paths) {
       processed++;
       var splitted = path.$1.split('/');
       String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
-      String progress = AnsiStyles.cyan('[$processed/$total]');
+      String progress = AnsiStyles.red('[$processed/$total]');
 
       if (arguments.contains('--apply')) {
-        stdout.write('${AnsiStyles.bgYellow.black.bold(' Atenção! ')} Você tem certeza que deseja limpar o projeto ${AnsiStyles.yellow(projeto)}? [s/N]: ');
-        String? confirm = stdin.readLineSync();
-        if (confirm == null || confirm.toLowerCase() != 's') {
-          stdout.write('$progress ${AnsiStyles.yellow('Ação cancelada para')} $projeto.\n');
-
-          continue;
-        }
         await Task(
-          tag: '$progress $name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)}',
+          tag: '$name$progress${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)}',
           description: 'Limpando',
           task: () async {
             if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
@@ -69,6 +79,16 @@ class Clean {
 
               if (exitCode != 0) {
                 throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+              }
+
+              // Remove a pasta .bundles se existir
+              if (await Directory('${path.$1}/.bundles').exists()) {
+                List<String> bundlesArgs = ['-rf', '.bundles'];
+                Process bundlesProcess = await Process.start('rm', bundlesArgs);
+                int bundlesExitCode = await bundlesProcess.exitCode;
+                if (bundlesExitCode != 0) {
+                  throw Exception('$name ${typeNamed(path.$2)} ${AnsiStyles.yellow(path.$1.split('/').last)} EXITCODE != 0');
+                }
               }
             }
             if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
@@ -113,14 +133,17 @@ class Clean {
             }
           },
         ).run();
-        stdout.write('${AnsiStyles.red('[ZTY]')}$name  ${AnsiStyles.green('✔ Limpeza concluída para:')} ${AnsiStyles.yellow(projeto)}\n');
       } else {
         Directory? directory;
 
         if (path.$2 == "JavaScript" || path.$2 == "Typescript") {
           directory = Directory('${path.$1}/node_modules');
         } else if (path.$2 == 'Flutter' || path.$2 == 'Dart') {
-          directory = Directory('${path.$1}/build');
+          var buildDir = Directory('${path.$1}/build');
+          var bundlesDir = Directory('${path.$1}/.bundles');
+          if (await buildDir.exists() || await bundlesDir.exists()) {
+            directory = Directory(path.$1);
+          }
         } else if (path.$2 == 'PHP') {
           var nodeModules = Directory('${path.$1}/node_modules');
           var vendor = Directory('${path.$1}/vendor');
@@ -131,9 +154,9 @@ class Clean {
         if (directory == null) return;
 
         if (await directory.exists()) {
-          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.red('PENDENTE')} \n');
+          stdout.write('${zty()}$name$progress ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.red('PENDENTE')} \n');
         } else {
-          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.green('OK')} \n');
+          stdout.write('${zty()}$name$progress ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.green('OK')} \n');
         }
 
         // caso tenha pasta /build retornar como pendente

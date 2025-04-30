@@ -40,6 +40,26 @@ class Delete {
     }
 
     stdout.write('\r${zty()}$name - ${paths.length} Projeto${paths.length > 1 ? 's' : ''} Encontrado${paths.length > 1 ? 's' : ''}      \n\n');
+
+    if (!arguments.contains('--apply')) {
+      stdout.write('${AnsiStyles.dim('Listando projetos disponíveis (use --apply para mover para lixeira):')}\n\n');
+    } else {
+      stdout.write('${AnsiStyles.bgRed.white.bold(' Atenção! ')} Os seguintes projetos serão movidos para a lixeira:\n\n');
+      for (var path in paths) {
+        var splitted = path.$1.split('/');
+        String projeto = '${splitted[splitted.length - 2]}/${splitted.last}';
+        String size = await getDirectorySize(path.$1);
+        stdout.write('  - ${AnsiStyles.yellow(projeto)} ${AnsiStyles.dim('(')}$size${AnsiStyles.dim(')')}\n');
+      }
+      stdout.write('\nVocê tem certeza que deseja mover ${paths.length} projeto${paths.length > 1 ? 's' : ''} para a lixeira? [s/N]: ');
+      String? confirm = stdin.readLineSync();
+      if (confirm == null || confirm.toLowerCase() != 's') {
+        stdout.write('\n${zty()}$name - ${AnsiStyles.yellow('Operação cancelada.')}\n');
+        return;
+      }
+      stdout.write('\n');
+    }
+
     int processed = 0;
     int total = paths.length;
     for (var path in paths) {
@@ -49,13 +69,6 @@ class Delete {
       String progress = AnsiStyles.cyan('[$processed/$total]');
 
       if (arguments.contains('--apply')) {
-        stdout.write('${AnsiStyles.bgRed.white.bold(' Atenção! ')} Você tem certeza que deseja mover o projeto ${AnsiStyles.yellow(projeto)} para a lixeira? [s/N]: ');
-        String? confirm = stdin.readLineSync();
-        if (confirm == null || confirm.toLowerCase() != 's') {
-          stdout.write('$progress ${AnsiStyles.yellow('Ação cancelada para')} $projeto.\n');
-
-          continue;
-        }
         try {
           await Task(
             tag: '$progress $name ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)}',
@@ -87,7 +100,7 @@ class Delete {
       } else {
         try {
           String size = await getDirectorySize(path.$1);
-          stdout.write('$progress ${zty()}$name ${typeNamed(path.$2)} $size ${AnsiStyles.yellow(projeto)}\n');
+          stdout.write('$progress ${typeNamed(path.$2)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.dim('(')}$size${AnsiStyles.dim(')')}\n');
         } catch (e) {
           stdout.write('$progress ${AnsiStyles.red('Erro ao calcular tamanho de')} $projeto: ${e.toString()}\n');
         }
