@@ -55,19 +55,26 @@ class Build {
       await bundlesDir.create();
     }
 
-    // Gerar Android App Bundle
+    // Gerar Android App Bundle ou APK
     if (platformsSupported.contains('android')) {
-      // Verificar se existe o arquivo key.properties
-      var keyPropertiesFile = File('android/key.properties');
-      if (!await keyPropertiesFile.exists()) {
-        throw Exception('Arquivo android/key.properties não encontrado. Este arquivo é necessário para gerar o build Android.');
+      var buildType = arguments.contains('--apk') ? 'apk' : 'appbundle';
+      var buildCommand = buildType == 'apk' ? 'apk' : 'appbundle';
+      var buildExtension = buildType == 'apk' ? 'apk' : 'aab';
+      var buildPath = buildType == 'apk' ? 'build/app/outputs/apk/release/app-release.apk' : 'build/app/outputs/bundle/release/app-release.aab';
+
+      // Verificar se existe o arquivo key.properties apenas para app bundle
+      if (buildType == 'appbundle') {
+        var keyPropertiesFile = File('android/key.properties');
+        if (!await keyPropertiesFile.exists()) {
+          throw Exception('Arquivo android/key.properties não encontrado. Este arquivo é necessário para gerar o App Bundle.');
+        }
       }
 
       await Task(
           tag: '$name ${AnsiStyles.green('[Android]')} ${AnsiStyles.yellow(projectName)}',
-          description: 'Gerando App Bundle',
+          description: 'Gerando $buildType',
           task: () async {
-            var process = await Process.start('flutter', ['build', 'appbundle', '--release']);
+            var process = await Process.start('flutter', ['build', buildCommand, '--release']);
             process.stderr.transform(utf8.decoder).listen((data) {
               stderr.write(data);
             });
@@ -77,11 +84,11 @@ class Build {
               throw Exception('Erro ao gerar App Bundle');
             }
 
-            // Mover e renomear o arquivo .aab
-            var aabFile = File('build/app/outputs/bundle/release/app-release.aab');
-            if (await aabFile.exists()) {
-              var newPath = path.join('.bundles', '${projectName}_$projectVersion.aab');
-              await aabFile.copy(newPath);
+            // Mover e renomear o arquivo gerado
+            var outputFile = File(buildPath);
+            if (await outputFile.exists()) {
+              var newPath = path.join('.bundles', '${projectName}_$projectVersion.$buildExtension');
+              await outputFile.copy(newPath);
             }
           }).run();
     }
