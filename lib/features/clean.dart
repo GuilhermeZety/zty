@@ -151,7 +151,10 @@ class Clean {
             directory = Directory(path.$1);
           }
         }
-        if (directory == null) return;
+        if (directory == null) {
+          stdout.write('${zty()}$name$progress ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.green('OK')} \n');
+          continue;
+        }
 
         if (await directory.exists()) {
           stdout.write('${zty()}$name$progress ${typeNamed(path.$2)} ${await getDirectorySize(path.$1)} ${AnsiStyles.yellow(projeto)} ${AnsiStyles.red('PENDENTE')} \n');

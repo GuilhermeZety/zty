@@ -7,11 +7,13 @@ executables:
   zty: zty
 
 environment:
-  sdk: ^3.5.3
+  sdk: ">=3.4.0 <4.0.0"
 
 # Add regular dependencies here.
 dependencies:
   ansi_styles: ^0.3.2+1
+  path: ^1.9.1
+  yaml: ^3.1.3
   # path: ^1.8.0
 
 dev_dependencies:

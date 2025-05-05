@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:ansi_styles/ansi_styles.dart';
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
-import 'package:zty/rotating_loader.dart';
 import 'package:zty/task.dart';
 import 'package:zty/zty.dart';
 
 class Build {
   static Future run(List<String> arguments) async {
-    var loader = Loader();
     stdout.write('${zty()}$name - Iniciando...\n');
 
     // Verificar se é um projeto Flutter
