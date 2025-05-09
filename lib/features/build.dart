@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:ansi_styles/ansi_styles.dart';
@@ -54,8 +53,8 @@ class Build {
     }
 
     // Gerar Android App Bundle ou APK
+    var buildType = arguments.contains('--apk') ? 'apk' : 'appbundle';
     if (platformsSupported.contains('android')) {
-      var buildType = arguments.contains('--apk') ? 'apk' : 'appbundle';
       var buildCommand = buildType == 'apk' ? 'apk' : 'appbundle';
       var buildExtension = buildType == 'apk' ? 'apk' : 'aab';
       var buildPath = buildType == 'apk' ? 'build/app/outputs/apk/release/app-release.apk' : 'build/app/outputs/bundle/release/app-release.aab';
@@ -73,9 +72,9 @@ class Build {
           description: 'Gerando $buildType',
           task: () async {
             var process = await Process.start('flutter', ['build', buildCommand, '--release']);
-            process.stderr.transform(utf8.decoder).listen((data) {
-              stderr.write(data);
-            });
+            // process.stderr.transform(utf8.decoder).listen((data) {
+            //   stderr.write(data);
+            // });
 
             var exitCode = await process.exitCode;
             if (exitCode != 0) {
@@ -98,9 +97,9 @@ class Build {
           description: 'Gerando IPA',
           task: () async {
             var process = await Process.start('flutter', ['build', 'ipa', '--release']);
-            process.stderr.transform(utf8.decoder).listen((data) {
-              stderr.write(data);
-            });
+            // process.stderr.transform(utf8.decoder).listen((data) {
+            //   stderr.write(data);
+            // });
 
             var exitCode = await process.exitCode;
             if (exitCode != 0) {
@@ -117,7 +116,18 @@ class Build {
     }
 
     stdout.write('\n${zty()}$name - ${AnsiStyles.green('✔ Builds gerados com sucesso!')}\n');
-    stdout.write('${zty()}$name - Os arquivos foram salvos em: ${AnsiStyles.yellow('.bundles/')}\n');
+    stdout.write('${zty()}$name - Os arquivos foram salvos em: \n');
+
+    if (platformsSupported.contains('android')) {
+      if (buildType == 'apk') {
+        stdout.write('\n${zty()}$name ${AnsiStyles.green('[Android]')} - Bundle gerado: ${AnsiStyles.yellow('.bundles/${projectName}_$projectVersion.apk')}        ');
+      } else {
+        stdout.write('\n${zty()}$name ${AnsiStyles.green('[Android]')} - Bundle gerado: ${AnsiStyles.yellow('.bundles/${projectName}_$projectVersion.aab')}        ');
+      }
+    }
+    if (platformsSupported.contains('ios')) {
+      stdout.write('\n${zty()}$name ${AnsiStyles.cyan('[iOS]')} - Bundle gerado: ${AnsiStyles.yellow('.bundles/${projectName}_$projectVersion.ipa')}        ');
+    }
   }
 }
 
