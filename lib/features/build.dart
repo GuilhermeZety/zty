@@ -89,28 +89,42 @@ class Build {
             }
           }).run();
     }
-
     // Gerar iOS IPA
     if (platformsSupported.contains('ios')) {
+      // Ler o nome do projeto do Info.plist para iOS
+      var infoPlistFile = File('ios/Runner/Info.plist');
+      if (!await infoPlistFile.exists()) {
+        throw Exception('Arquivo Info.plist não encontrado em ios/Runner/Info.plist');
+      }
+
+      var infoPlistContent = await infoPlistFile.readAsString();
+      var bundleNameMatch = RegExp(r'<key>CFBundleName</key>\s*<string>(.*?)</string>').firstMatch(infoPlistContent);
+      var iosProjectName = bundleNameMatch?.group(1) ?? projectName;
+
       await Task(
           tag: '$name ${AnsiStyles.cyan('[iOS]')} ${AnsiStyles.yellow(projectName)}',
           description: 'Gerando IPA',
           task: () async {
             var process = await Process.start('flutter', ['build', 'ipa', '--release']);
-            // process.stderr.transform(utf8.decoder).listen((data) {
-            //   stderr.write(data);
-            // });
 
             var exitCode = await process.exitCode;
             if (exitCode != 0) {
               throw Exception('Erro ao gerar IPA');
             }
 
-            // Mover e renomear o arquivo .ipa
-            var ipaFile = File('build/ios/ipa/$projectName.ipa');
+            // Mover e renomear o arquivo .ipa usando o nome do iOS
+            var ipaFile = File('build/ios/ipa/$iosProjectName.ipa');
             if (await ipaFile.exists()) {
               var newPath = path.join('.bundles', '${projectName}_$projectVersion.ipa');
               await ipaFile.copy(newPath);
+
+              // Verificar se o arquivo foi copiado com sucesso
+              var copiedFile = File(newPath);
+              if (!await copiedFile.exists()) {
+                throw Exception('Erro ao copiar o arquivo IPA para a pasta .bundles');
+              }
+            } else {
+              throw Exception('Arquivo IPA não foi gerado corretamente em build/ios/ipa/$iosProjectName.ipa');
             }
           }).run();
     }
