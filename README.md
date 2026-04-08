@@ -1,162 +1,186 @@
-# ZTY
+# ZTY CLI ⚡
 
-CLI opensource para utilitários do seu setup Flutter e outros frameworks. Uma ferramenta poderosa para gerenciar seus projetos de desenvolvimento de forma eficiente e automatizada.
+ZTY é uma CLI open-source projetada para otimizar e automatizar rotinas no seu setup de desenvolvimento. Uma ferramenta indispensável para gerenciar múltiplos projetos simultaneamente, fazer limpezas profundas, gerar builds e manter seu código limpo.
 
-## Sumário
+## 📑 Sumário
 
-- [Recursos](#recursos)
-- [Suporte](#suporte)
-- [Instalação](#instalação)
-- [Comandos](#comandos)
-- [Opções Globais](#opções-globais)
-- [Contribuição](#contribuição)
+- [Recursos](#-recursos)
+- [Ecossistemas Suportados](#-ecossistemas-suportados)
+- [Instalação](#-instalação)
+- [Comandos](#-comandos)
+- [Filtros Globais](#-filtros-globais)
+- [Contribuição](#-contribuição)
 
-## Recursos
+## ✨ Recursos
 
-- Verificação de atualizações pendentes nos projetos
-- Verificação de status do Git em múltiplos projetos
-- Limpeza automática de projetos (cache, builds, etc.)
-- Gerenciamento de projetos obsoletos
-- Atualização automática da CLI
-- Suporte a múltiplos projetos simultaneamente
-- Opções flexíveis de filtragem de projetos
+- **Gestão em Lote:** Trabalhe com múltiplos repositórios ao mesmo tempo.
+- **Git Smart:** Verificação de status e atualizações pendentes em todos os seus projetos de uma vez.
+- **Deep Clean:** Limpeza inteligente de cache, `node_modules`, `builds` e pastas temporárias.
+- **Build Manager:** Geração automatizada de bundles (APK, AAB, IPA) concentrados em uma pasta limpa (`.bundles/`).
+- **Dead Code Finder:** Análise estática avançada para encontrar pacotes, assets e arquivos órfãos em projetos Flutter (com suporte a arquitetura Monorepo).
+- **Self-Update:** Atualização da própria CLI com um único comando.
 
-## Suporte
+## 🛠 Ecossistemas Suportados
 
-- Flutter
-- Dart
-- Node
-- PHP
+A CLI é capaz de identificar e interagir com os seguintes tipos de projeto:
+- Flutter / Dart **FUNCIONAL
+- Node.js (JavaScript / TypeScript) **Não Testado
+- PHP **Não Testado
 
-## Instalação
+---
 
-### Linux
-1. Instale o Dart SDK:
-   ```bash
-   # Usando apt (Debian/Ubuntu)
-   sudo apt-get update
-   sudo apt-get install apt-transport-https
-   wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
-   echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list
-   sudo apt-get update
-   sudo apt-get install dart
+## 🚀 Instalação
 
-   # Usando snap (Ubuntu e outras distribuições compatíveis)
-   sudo snap install dart --classic
-   ```
+A ZTY CLI é construída em Dart. 
+> 💡 **Dica:** Se você já é um desenvolvedor Flutter, o Dart já está instalado na sua máquina. Você pode pular o "Passo 1" e ir direto para o "Passo 2".
 
-2. Clone o repositório:
-   ```bash
-   git clone https://github.com/GuilhermeZety/zty.git
-   ```
+### Passo 1: Instalar o Dart SDK
 
-3. Entre na pasta do projeto:
-   ```bash
-   cd zty
-   ```
+**🍎 macOS (via Homebrew)**
+```bash
+brew tap dart-lang/dart
+brew install dart
+```
 
-4. Instale as dependências:
-   ```bash
-   dart pub get
-   ```
+**🪟 Windows (via Chocolatey)**
+Abra o PowerShell como Administrador e execute:
+```powershell
+choco install dart-sdk
+```
 
-5. Ative a CLI globalmente:
-   ```bash
-   dart pub global activate --source path .
-   ```
+**🐧 Linux**
+```bash
+# Usando apt (Debian/Ubuntu)
+sudo apt-get update
+sudo apt-get install apt-transport-https
+wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/dart.gpg
+echo 'deb [signed-by=/usr/share/keyrings/dart.gpg arch=amd64] https://storage.googleapis.com/download.dartlang.org/linux/debian stable main' | sudo tee /etc/apt/sources.list.d/dart_stable.list
+sudo apt-get update
+sudo apt-get install dart
 
-   **Nota**: Se necessário, adicione o path do Dart ao seu PATH:
-   ```bash
-   echo 'export PATH="$PATH":"$HOME/.pub-cache/bin"' >> ~/.bashrc
-   source ~/.bashrc
-   ```
-   Para outros shells como zsh, adicione a linha ao arquivo ~/.zshrc correspondente.
+# Ou usando snap
+sudo snap install dart --classic
+```
 
-### macOS
+### Passo 2: Clonar e Ativar a CLI (Todos os Sistemas)
+Abra seu terminal e execute os comandos abaixo para baixar e ativar a CLI globalmente:
 
-## Comandos
+```bash
+# 1. Clone o repositório
+git clone https://github.com/GuilhermeZety/zty.git
 
-### verify
-Verifica se há atualizações pendentes em todos os seus projetos Git.
+# 2. Acesse a pasta
+cd zty
+
+# 3. Baixe as dependências
+dart pub get
+
+# 4. Ative a CLI globalmente
+dart pub global activate --source path .
+```
+
+### Passo 3: Configurar o PATH
+Para que o comando `zty` funcione de qualquer lugar do seu terminal, você precisa garantir que a pasta de cache do Dart esteja nas suas variáveis de ambiente (`PATH`).
+
+**🍎 macOS / 🐧 Linux**
+Adicione a linha abaixo no final do seu arquivo `~/.zshrc` (se usar ZSH) ou `~/.bashrc` (se usar Bash):
+```bash
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+```
+*Após adicionar, reinicie o terminal ou rode `source ~/.zshrc`.*
+
+**🪟 Windows**
+1. Pressione a tecla `Windows` e digite **"Variáveis de Ambiente"**.
+2. Clique em **"Editar as variáveis de ambiente do sistema"**.
+3. Clique no botão **"Variáveis de Ambiente..."**.
+4. Na lista de "Variáveis do usuário", selecione `Path` e clique em **Editar**.
+5. Clique em **Novo** e adicione o seguinte caminho:
+   `%LOCALAPPDATA%\Pub\Cache\bin`
+6. Clique em OK em todas as janelas e reinicie seu terminal.
+
+---
+
+## 💻 Comandos
+
+### `find` *(Novo)*
+Executa uma análise de código morto profunda no seu projeto Flutter. Diferente de outros comandos, o `find` **deve ser executado na raiz de um projeto Flutter específico**.
+```bash
+zty find
+```
+**O que ele analisa (Suporta Monorepos):**
+- 📦 **Packages:** Cruza o `pubspec.yaml` com o código para achar dependências não importadas.
+- 🖼️ **Assets:** Lê os arquivos de mídia reais no disco e cruza com Strings no seu código para achar imagens não utilizadas.
+- 📄 **Arquivos Dart:** Analisa referências cruzadas em todas as pastas `lib/` do projeto e de seus sub-módulos locais para encontrar arquivos soltos/órfãos.
+
+### `clean`
+Inspeciona e limpa pastas de build, cache, `node_modules` e `vendor`.
+```bash
+zty clean            # Inspeciona e lista o que precisa de limpeza
+zty clean --apply    # Executa a limpeza pesada nos projetos
+```
+
+### `build`
+Gera os aplicativos compilados para Android e iOS. Funciona apenas na raiz de projetos Flutter.
+```bash
+zty build            # Gera AppBundle (.aab) para Android e IPA para iOS
+zty build --apk      # Gera um .apk ao invés do AppBundle
+```
+*Dica: Os arquivos compilados serão organizados automaticamente dentro de uma pasta oculta `.bundles/` na raiz do seu projeto.*
+
+### `verify`
+Verifica se há commits pendentes no repositório remoto para todos os seus projetos locais.
 ```bash
 zty verify
 ```
-Este comando verifica todas as branches de cada projeto e informa se existem commits para serem baixados do repositório remoto.
 
-### status
-Verifica o status do Git em todos os projetos, identificando alterações não commitadas.
+### `status`
+Resume o status atual do Git (arquivos modificados, unstaged) de todos os projetos simultaneamente.
 ```bash
 zty status
 ```
-Exibe um resumo detalhado de arquivos modificados, não rastreados e commits não enviados para cada projeto.
 
-### clean
-Gerencia a limpeza dos projetos, removendo arquivos de build e caches.
+### `delete`
+Ferramenta para envio seguro de projetos obsoletos para a lixeira do sistema.
 ```bash
-zty clean            # Verifica projetos que precisam de limpeza
-zty clean --apply    # Executa a limpeza em todos os projetos
-```
-Opções específicas:
-- `--apply`: Executa a limpeza automaticamente
-- `--only projeto1,projeto2`: Limpa apenas os projetos especificados
-- `--ignore projeto1,projeto2`: Ignora os projetos especificados
-
-### delete
-Gerencia projetos obsoletos, permitindo movê-los para a lixeira de forma segura.
-```bash
-zty delete           # Lista projetos que podem ser movidos para lixeira
+zty delete           # Lista candidatos a exclusão
 zty delete --apply   # Move os projetos selecionados para a lixeira
 ```
-Opções específicas:
-- `--apply`: Executa a movimentação dos projetos selecionados para a lixeira
 
-### update
-Atualiza a CLI ZTY para a versão mais recente do repositório.
+### `update`
+Atualiza a sua própria CLI para a última versão disponível no Github.
 ```bash
 zty update
 ```
-Verifica, baixa e instala automaticamente a última versão disponível da CLI.
 
-### build
-Gera bundles do aplicativo para Android e iOS em projetos Flutter.
+---
+
+## 🎯 Filtros Globais
+
+Comandos que atuam em lote (como `clean`, `verify`, `status`) aceitam os seguintes modificadores para filtrar onde a ação será executada:
+
+### `--only`
+Restringe a execução apenas aos projetos especificados.
 ```bash
-zty build            # Inicia o processo de build interativo
-```
-<!-- Opções específicas:
-- `--release`: Compila em modo release (padrão)
-- `--debug`: Compila em modo debug
-- `--only projeto1,projeto2`: Executa build apenas nos projetos especificados
-- `--ignore projeto1,projeto2`: Ignora os projetos especificados durante o build -->
-
-## Opções Globais
-
-### --only
-Executa o comando apenas nos projetos especificados.
-```bash
-zty clean --only projeto1,projeto2
-```
-Útil para focar em projetos específicos quando você tem muitos repositórios.
-
-### --ignore
-Executa o comando em todos os projetos, exceto os especificados.
-```bash
-zty clean --ignore projeto1,projeto2
-```
-Permite excluir projetos específicos da execução do comando.
-
-### --help, -h
-Exibe a mensagem de ajuda com todos os comandos disponíveis.
-```bash
-zty --help
-zty -h
+zty clean --apply --only app_mobile,backend_api
 ```
 
-## Contribuição
+### `--ignore`
+Executa em todos os projetos descobertos, **exceto** os especificados.
+```bash
+zty status --ignore projeto_legado,api_velha
+```
 
-Contribuições são sempre bem-vindas! Se você encontrou um bug ou tem uma sugestão de melhoria:
+---
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Faça commit das suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+## 🤝 Contribuição
+
+A ZTY CLI é open-source e contribuições são sempre bem-vindas! Para contribuir:
+
+1. Faça um *Fork* do projeto
+2. Crie uma branch com a sua feature (`git checkout -b feature/minha-feature`)
+3. Faça o commit das suas mudanças (`git commit -m 'feat: adicionando nova funcionalidade X'`)
+4. Faça o push para a branch (`git push origin feature/minha-feature`)
+5. Abra um **Pull Request** descrevendo o que foi alterado.
+
+***
+*Desenvolvido por Guilherme Zety.*
