@@ -28,8 +28,13 @@ class ConvertIcons {
         .toList();
 
     if (files.isEmpty) {
+      stdout.write('${zty()}$name - ${AnsiStyles.yellow('Nenhum arquivo .svg encontrado.')}\n\n');
+      stdout.write('   Você executou o comando no diretório:\n');
+      stdout.write('   📁 ${AnsiStyles.gray(layoutDir.path)}\n\n');
       stdout.write(
-          '${zty()}$name - ${AnsiStyles.yellow('Nenhum arquivo .svg encontrado no diretório atual.')}\n');
+          '   ${AnsiStyles.cyan.bold('💡 Dica:')} Navegue até a pasta que contém os seus ícones antes de rodar a CLI:\n');
+      stdout.write('   👉 ${AnsiStyles.yellow('cd caminho/para/sua/pasta/de/assets')}\n');
+      stdout.write('   👉 ${AnsiStyles.yellow('zty icons')}\n\n');
       return;
     }
 

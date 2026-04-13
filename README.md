@@ -102,6 +102,18 @@ export PATH="$PATH":"$HOME/.pub-cache/bin"
 
 ## 💻 Comandos
 
+
+### `convert-icons` *(Novo)*
+Processa uma pasta inteira de SVGs exportados por designers. Ele usa o Inkscape para converter "Strokes" em "Fills" (Traços em Caminhos), limpa tags sujas (metadados, styles), padroniza preenchimentos para `black` e renomeia tudo para `snake_case`.
+
+> 💡 **FlutterIcon Ready:** Essa conversão e limpeza extrema garantem que os seus SVGs sejam **100% suportados no site [FlutterIcon](https://www.fluttericon.com/)** para a geração de WebFonts customizadas (eliminando de vez os bugs de renderização ou ícones que ficam invisíveis).
+
+```bash
+zty convert-icons
+```
+*O comando varre o diretório atual e salva os arquivos finais dentro da pasta `converted_icons/`.*
+
+
 ### `find` *(Novo)*
 Executa uma análise de código morto profunda no seu projeto Flutter. Diferente de outros comandos, o `find` **deve ser executado na raiz de um projeto Flutter específico**.
 ```bash
