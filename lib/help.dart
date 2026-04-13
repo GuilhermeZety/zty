@@ -10,31 +10,34 @@ void showHelp() {
   // Comandos Principais
   stdout.write('\r${AnsiStyles.underline.yellow('Comandos Principais')}:\n');
   stdout.write(
-    '\r  ${AnsiStyles.green('verify')}        Verifica se há atualizações pendentes nos repositórios Git.\n',
+    '\r  ${AnsiStyles.green('verify')}         Verifica se há atualizações pendentes nos repositórios Git.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('status')}        Verifica o status Git dos projetos (pendências para commit/push).\n',
+    '\r  ${AnsiStyles.green('status')}         Verifica o status Git dos projetos (pendências para commit/push).\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('clean')}         Verifica quais projetos podem precisar de limpeza (ex: Flutter/Dart clean).\n',
+    '\r  ${AnsiStyles.green('clean')}          Verifica quais projetos podem precisar de limpeza (ex: Flutter/Dart clean).\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('build')}         Gera bundles do aplicativo para Android e iOS em projetos Flutter.\n',
+    '\r  ${AnsiStyles.green('build')}          Gera bundles do aplicativo para Android e iOS em projetos Flutter.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('clean --apply')} Executa a limpeza nos projetos identificados.\n',
+    '\r  ${AnsiStyles.green('clean --apply')}  Executa a limpeza nos projetos identificados.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('delete')}        Lista projetos que podem ser movidos para a lixeira (sem atividade Git recente).\n',
+    '\r  ${AnsiStyles.green('delete')}         Lista projetos que podem ser movidos para a lixeira (sem atividade Git recente).\n',
   );
   stdout.write(
     '\r  ${AnsiStyles.green('delete --apply')} Move os projetos selecionados para a lixeira.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('find')}        Analiza o projeto Flutter e identifica possiveis arquivos, assets ou packages não utilizados.\n',
+    '\r  ${AnsiStyles.green('find')}           Analiza o projeto Flutter e identifica possiveis arquivos, assets ou packages não utilizados.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('update')}        Atualiza a CLI ZTY para a versão mais recente.\n',
+    '\r  ${AnsiStyles.green('convert-icons')}  Converte SVGs, limpa código sujo e converte "Strokes" para "Fills" para ser suportado no https://www.fluttericon.com/ (Requer Inkscape)\n',
+  );
+  stdout.write(
+    '\r  ${AnsiStyles.green('update')}         Atualiza a CLI ZTY para a versão mais recente.\n',
   );
   stdout.write('\r\n');
 
