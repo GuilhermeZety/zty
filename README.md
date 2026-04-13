@@ -114,7 +114,7 @@ zty convert-icons
 *O comando varre o diretório atual e salva os arquivos finais dentro da pasta `converted_icons/`.*
 
 
-### `find` *(Novo)*
+### `find`
 Executa uma análise de código morto profunda no seu projeto Flutter. Diferente de outros comandos, o `find` **deve ser executado na raiz de um projeto Flutter específico**.
 ```bash
 zty find
