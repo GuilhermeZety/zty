@@ -114,6 +114,27 @@ zty convert-icons
 *O comando varre o diretório atual e salva os arquivos finais dentro da pasta `converted_icons/`.*
 
 
+### `findStrings`
+Executa uma varredura inteligente para encontrar **strings** definidas na sua camada de internacionalização (por exemplo, arquivos gerados pelo EasyLocalization) que não estão mais sendo utilizadas em nenhum lugar do código.
+
+```bash
+zty find-strings
+```
+
+**Como funciona:**
+- 💡 O comando busca todas as classes geradas pelo EasyLocalization (ex: `LocaleKeys`) e cruza todas as keys com as referências presentes em todo o seu código Dart.
+- 🗃️ Exibe, agrupado por arquivo, todas as strings que não são usadas em nenhuma tela, widget ou lógica.
+- 🔍 Funciona tanto em projetos single-app quanto em monorepos Flutter.
+
+**Dica:** Assegure-se de rodar o comando após dar manutenção em arquivos de tradução para garantir que não está carregando textos nunca usados (ajuda a manter o app enxuto e evita retrabalho em traduções).
+
+**Exemplo de uso:**
+```bash
+zty find-strings
+```
+A saída irá listar, por arquivo de strings (ex: `locale_keys.g.dart`), as labels não referenciadas, recomendando a remoção manual para você manter sua base limpa.
+
+
 ### `find`
 Executa uma análise de código morto profunda no seu projeto Flutter. Diferente de outros comandos, o `find` **deve ser executado na raiz de um projeto Flutter específico**.
 ```bash
