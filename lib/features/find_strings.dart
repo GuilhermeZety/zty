@@ -353,6 +353,14 @@ class FindStrings {
       }
     }
 
+    // Separa os arquivos de strings dos arquivos de código de negócio comuns de forma case-insensitive e flexível
+    for (var file in allDartFiles) {
+      final lowercasePath = file.path.toLowerCase().trim();
+      if (lowercasePath.endsWith('strings.dart')) {
+        stringFiles.add(file);
+      }
+    }
+
     stdout.write(
       AnsiStyles.green(
         'OK (${stringFiles.length} arquivos de strings e ${allDartFiles.length - stringFiles.length} de código comuns)\n',
@@ -365,8 +373,11 @@ class FindStrings {
     }
 
     // --- FASE 2: Carregando código comum para a memória (Lotes concorrentes) ---
-    List<File> codeFiles =
-        allDartFiles.where((f) => !path.basename(f.path).endsWith('_strings.dart')).toList();
+    List<File> codeFiles = allDartFiles.where((f) {
+      final pathLower = f.path.toLowerCase().trim();
+      return !pathLower.endsWith('strings.dart');
+    }).toList();
+
     int totalFiles = codeFiles.length;
     Map<String, String> fileContents = {};
 
