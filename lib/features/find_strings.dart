@@ -297,6 +297,8 @@ class FindStrings {
   static Future run(List<String> arguments) async {
     stdout.write('${zty()}$name - Iniciando análise de strings mortas...\n\n');
 
+    final bool showAllPaths = arguments.contains('--show-all-paths');
+
     if (!await File('pubspec.yaml').exists()) {
       throw Exception(
         'Este comando só pode ser executado na raiz de um projeto Flutter/Dart (pubspec.yaml não encontrado).',
@@ -439,7 +441,6 @@ class FindStrings {
       }).toList();
 
       // Mapeamento de variáveis locais criadas a partir das classes de string (Alias Tracker)
-      // Ex: final strings = AuthenticationStrings.idValidationInstructions; -> strings mapeado para AuthenticationStrings.idValidationInstructions
       Map<String, Map<String, String>> fileAliases =
           {}; // filePath -> {aliasVariable: assignedPrefixPath}
       for (var entry in candidateFiles) {
@@ -500,14 +501,14 @@ class FindStrings {
         );
       }
 
-      if (unusedKeys.isNotEmpty) {
+      if (unusedKeys.isNotEmpty || showAllPaths) {
         unusedStringsByFile[info.filePath] = unusedKeys;
       }
     }
     stdout.write(' ${AnsiStyles.green('OK')}\n');
 
     // --- FASE 5: Exibir Resultados ---
-    _printResults(unusedStringsByFile);
+    _printResults(unusedStringsByFile, showAllPaths);
   }
 
   /// Lê o arquivo de strings e gera todas as combinações de caminhos de acesso possíveis.
@@ -664,7 +665,6 @@ class FindStrings {
   }
 
   /// Busca mapeamentos locais (apelidos/aliases) que representam caminhos de strings neste arquivo.
-  /// Ex: final s = AuthenticationStrings.idValidation; -> retorna { 's': 'AuthenticationStrings.idValidation' }
   static Map<String, String> _findLocalAliases(String fileContent, List<String> rootClassNames) {
     Map<String, String> aliases = {};
 
@@ -686,10 +686,18 @@ class FindStrings {
     return aliases;
   }
 
-  static void _printResults(Map<String, List<String>> unusedStringsByFile) {
+  static void _printResults(Map<String, List<String>> unusedStringsByFile, bool showAllPaths) {
     stdout.write('\n${zty()}$name - ${AnsiStyles.green('✔ Análise de strings concluída!')}\n\n');
 
     if (unusedStringsByFile.isEmpty) {
+      stdout.write(
+        '  🎉 ${AnsiStyles.green.bold('Todas as strings mapeadas estão sendo utilizadas no seu app!')}\n\n',
+      );
+      return;
+    }
+
+    final bool hasAnyUnused = unusedStringsByFile.values.any((list) => list.isNotEmpty);
+    if (!hasAnyUnused && !showAllPaths) {
       stdout.write(
         '  🎉 ${AnsiStyles.green.bold('Todas as strings mapeadas estão sendo utilizadas no seu app!')}\n\n',
       );
