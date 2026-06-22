@@ -353,13 +353,6 @@ class FindStrings {
       }
     }
 
-    // Separa os arquivos de strings dos arquivos de código de negócio comuns
-    for (var file in allDartFiles) {
-      if (path.basename(file.path).endsWith('_strings.dart')) {
-        stringFiles.add(file);
-      }
-    }
-
     stdout.write(
       AnsiStyles.green(
         'OK (${stringFiles.length} arquivos de strings e ${allDartFiles.length - stringFiles.length} de código comuns)\n',
@@ -421,7 +414,7 @@ class FindStrings {
     int totalKeysMapped = stringInfos.fold<int>(0, (sum, item) => sum + item.generatedPaths.length);
     stdout.write(' ${AnsiStyles.green('OK ($totalKeysMapped caminhos mapeados)')}\n\n');
 
-    // --- FASE 4: Análise de Referências (Interativo e Multilinhas-safe) ---
+    // --- FASE 4: Análise de Referências (Interativo, Multilinhas e com Alias-Tracking) ---
     stdout.write('${zty()}$name - Analisando referências de strings: [0/$totalKeysMapped]');
     Map<String, List<String>> unusedStringsByFile = {};
     int analyzedKeys = 0;
@@ -434,15 +427,56 @@ class FindStrings {
         return info.rootClassNames.any((rootName) => entry.value.contains(rootName));
       }).toList();
 
+      // Mapeamento de variáveis locais criadas a partir das classes de string (Alias Tracker)
+      // Ex: final strings = AuthenticationStrings.idValidationInstructions; -> strings mapeado para AuthenticationStrings.idValidationInstructions
+      Map<String, Map<String, String>> fileAliases =
+          {}; // filePath -> {aliasVariable: assignedPrefixPath}
+      for (var entry in candidateFiles) {
+        fileAliases[entry.key] = _findLocalAliases(entry.value, info.rootClassNames);
+      }
+
       for (var keyPath in info.generatedPaths) {
+        // Expressão regular tolerante a quebras de linhas no padrão tradicional: Class.branch.leaf
         var pattern = keyPath.split('.').map(RegExp.escape).join(r'\s*\.\s*');
         var regExp = RegExp(pattern);
 
         bool isUsed = false;
         for (var entry in candidateFiles) {
+          // 1. Validação padrão pelo caminho absoluto completo (direto)
           if (regExp.hasMatch(entry.value)) {
             isUsed = true;
             break;
+          }
+
+          // 2. Validação alternativa por meio de aliases mapeados no arquivo atual
+          var aliases = fileAliases[entry.key] ?? {};
+          if (aliases.isNotEmpty) {
+            bool usedByAlias = false;
+            for (var aliasEntry in aliases.entries) {
+              var varName = aliasEntry.key;
+              var pathPrefix = aliasEntry.value;
+
+              // Se a chave absoluta começar com o caminho mapeado no alias (ex: 'AuthenticationStrings.idValidationInstructions.')
+              if (keyPath.startsWith('$pathPrefix.')) {
+                // Remove o prefixo para extrair o resto do caminho (ex: 'title')
+                var suffix = keyPath.substring(pathPrefix.length + 1);
+
+                // Constrói regex que procura o uso do alias: varName.suffix (tolerando multilinhas)
+                var aliasPattern = RegExp.escape(varName) +
+                    r'\s*\.\s*' +
+                    suffix.split('.').map(RegExp.escape).join(r'\s*\.\s*');
+                var aliasRegExp = RegExp(aliasPattern);
+
+                if (aliasRegExp.hasMatch(entry.value)) {
+                  usedByAlias = true;
+                  break;
+                }
+              }
+            }
+            if (usedByAlias) {
+              isUsed = true;
+              break;
+            }
           }
         }
         if (!isUsed) {
@@ -616,6 +650,29 @@ class FindStrings {
       var targetClassName = entry.value;
       _resolvePaths('$currentPath.$fieldName', targetClassName, classesByName, results);
     }
+  }
+
+  /// Busca mapeamentos locais (apelidos/aliases) que representam caminhos de strings neste arquivo.
+  /// Ex: final s = AuthenticationStrings.idValidation; -> retorna { 's': 'AuthenticationStrings.idValidation' }
+  static Map<String, String> _findLocalAliases(String fileContent, List<String> rootClassNames) {
+    Map<String, String> aliases = {};
+
+    for (var root in rootClassNames) {
+      // Regex que busca atribuições de caminhos com ou sem tipagem explícita
+      var pattern =
+          r'\b(?:const|final|var|_?[A-Z][a-zA-Z0-9_]*|dynamic)\s+([a-zA-Z0-9_]+)\s*=\s*(' +
+              RegExp.escape(root) +
+              r'(?:\s*\.\s*[a-zA-Z0-9_]+)*)\b';
+      var regex = RegExp(pattern);
+
+      for (var match in regex.allMatches(fileContent)) {
+        var varName = match.group(1)!;
+        // Normaliza eventuais quebras de linha/espaços na declaração do caminho atribuído
+        var assignedPath = match.group(2)!.replaceAll(RegExp(r'\s+'), '');
+        aliases[varName] = assignedPath;
+      }
+    }
+    return aliases;
   }
 
   static void _printResults(Map<String, List<String>> unusedStringsByFile) {

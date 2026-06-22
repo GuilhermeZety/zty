@@ -34,7 +34,7 @@ void showHelp() {
     '\r  ${AnsiStyles.green('find')}           Analiza o projeto Flutter e identifica possiveis arquivos, assets ou packages não utilizados.\n',
   );
   stdout.write(
-    '\r  ${AnsiStyles.green('find-strings')}   Analiza o projeto Flutter, identifica possiveis strings não utilizadas.\n',
+    '\r  ${AnsiStyles.green('find-strings')}   Analiza o projeto Flutter e identifica possiveis strings não utilizadas.\n',
   );
   stdout.write(
     '\r  ${AnsiStyles.green('convert-icons')}  Converte SVGs, limpa código sujo e converte "Strokes" para "Fills" para ser suportado no https://www.fluttericon.com/ (Requer Inkscape)\n',
