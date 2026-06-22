@@ -421,7 +421,7 @@ class FindStrings {
     int totalKeysMapped = stringInfos.fold<int>(0, (sum, item) => sum + item.generatedPaths.length);
     stdout.write(' ${AnsiStyles.green('OK ($totalKeysMapped caminhos mapeados)')}\n\n');
 
-    // --- FASE 4: Análise de Referências (Interativo) ---
+    // --- FASE 4: Análise de Referências (Interativo e Multilinhas-safe) ---
     stdout.write('${zty()}$name - Analisando referências de strings: [0/$totalKeysMapped]');
     Map<String, List<String>> unusedStringsByFile = {};
     int analyzedKeys = 0;
@@ -435,9 +435,12 @@ class FindStrings {
       }).toList();
 
       for (var keyPath in info.generatedPaths) {
+        var pattern = keyPath.split('.').map(RegExp.escape).join(r'\s*\.\s*');
+        var regExp = RegExp(pattern);
+
         bool isUsed = false;
         for (var entry in candidateFiles) {
-          if (entry.value.contains(keyPath)) {
+          if (regExp.hasMatch(entry.value)) {
             isUsed = true;
             break;
           }
